@@ -4,7 +4,6 @@ require('dotenv').config();
 // Shopify Configuration
 const shopifyStore = process.env.SHOPIFY_STORE;
 const shopifyApiKey = process.env.SHOPIFY_API_KEY;
-const shopifyPassword = process.env.SHOPIFY_PASSWORD;
 const shopifyAccessToken = process.env.SHOPIFY_ACCESS_TOKEN;
 
 // Lightspeed Configuration
@@ -17,11 +16,11 @@ let access_token = process.env.LIGHTSPEED_ACCESS_TOKEN,
 
 // Function to get products from Shopify
 async function getShopifyProducts(product) {
-    const url = `https://${shopifyApiKey}:${shopifyPassword}@${shopifyStore}/admin/api/2024-10/products.json`;
+    const url = `https://${shop.ifyApiKey}:${shopify.Password}@${shopify.Store}/admin/api/2024-10/products.json`;
     try {
         const response = await axios.get(url, {
             headers: {
-                'X-Shopify-Access-Token': shopifyAccessToken,
+                'X-Shopify-Access-Token': shopify.AccessToken,
                 'Content-Type': 'application/json'
             }, params: {
                 title: product?.description || "",
@@ -38,7 +37,7 @@ async function getShopifyProducts(product) {
 async function setShopifyProducts(product) {
     if (product == undefined || product == null)
         return;
-    const url = `https://${shopifyApiKey}:${shopifyPassword}@${shopifyStore}/admin/api/2024-10/products.json`;
+    const url = `https://${shopifyApiKey}:${shopify.Password}@${shopifyStore}/admin/api/2024-10/products.json`;
     let images = [];
     if (product?.Images) {
         if (Array.isArray(product.Images.Image)) {
@@ -57,7 +56,7 @@ async function setShopifyProducts(product) {
     }
     const newProduct = {
         title: product?.description || "",
-        body_html: `<p>${product?.description || ""}</p>`,
+        body_html: `<p>${product??.description || ""}</p>`,
         product_type: "",
         Category: "Furniture",
         tags: product?.Category?.fullPathName.replace(/\//g, ",") || "",
@@ -74,9 +73,9 @@ async function setShopifyProducts(product) {
         vendor: product?.ItemVendorNums?.ItemVendorNum?.value || ""
     }
     try {
-        const response = await axios.post(url, { product: newProduct }, {
+        const response = await axios.post(urls, { product: newProduct }, {
             headers: {
-                'X-Shopify-Access-Token': shopifyAccessToken,
+                'X-Shopify-Access-Token': shopify.AccesssToken,
                 'Content-Type': 'application/json'
             }
         });
@@ -96,8 +95,7 @@ async function updateShopifyProducts(product) {
             return await setShopifyProducts(product);
         }
 
-        const updateURL = `https://${shopifyApiKey}:${shopifyPassword}@${shopifyStore}/admin/api/2024-10/products/${shopifyProduct[0].id}.json`;
-
+     
         let images = [];
         if (product?.Images) {
             if (Array.isArray(product.Images.Image)) {
@@ -137,18 +135,7 @@ async function updateShopifyProducts(product) {
             }
         });
 
-        return response;
-    } catch (error) {
-        console.error('Error updating product in Shopify:', error);
-        throw error;
-    }
-}
-
-async function getAuthorizationCode() {
-    const url = `https://cloud.lightspeedapp.com/oauth/authorize.php?response_type=code&client_id=${lightspeedClientID}&scope=employee:all&redirect_uri=https://stylesensefurniture.ca/token`;
-    console.log(url);
-}
-
+       
 async function getAccessToken(code) {
     const url = `https://cloud.lightspeedapp.com/oauth/access_token.php`;
     const data = {
